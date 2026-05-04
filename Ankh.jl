@@ -431,7 +431,8 @@ function train_model(params, x_train::Any, y_train::Any, layer_dims::Vector{Int6
             adam_opt[string("s_dw",i)] = zeros(size(params[string("W",i)]))
             adam_opt[string("s_db",i)] = zeros(size(params[string("b",i)]))
         end
-        
+
+        t = 0
         for i = 1:epochs
             marker = 1
             loss = 0
@@ -447,17 +448,18 @@ function train_model(params, x_train::Any, y_train::Any, layer_dims::Vector{Int6
                 loss = calculate_cost(Ŷ, y_train[shuffled_index[marker:batch],:], loss_fcn, lambda, weights_sum)            
                 ∇ = back_propagation(Ŷ, y_train[shuffled_index[marker:batch],:], cache, activation_type, 
                     loss_fcn, lambda, n_reg)
-                
+
+                t += 1                
                 for j = 1:length(layer_dims)-1
                     adam_opt[string("v_dw",j)] = β1 .* adam_opt[string("v_dw",j)] .+ (1 - β1) .* ∇[string("∂W",j)]'
                     adam_opt[string("v_db",j)] = β1 .* adam_opt[string("v_db",j)] .+ (1 - β1) .* ∇[string("∂b",j)]'
                     adam_opt[string("s_dw",j)] = β2 .* adam_opt[string("s_dw",j)] .+ (1 - β2) .* ((∇[string("∂W",j)]') .^ 2 )
                     adam_opt[string("s_db",j)] = β2 .* adam_opt[string("s_db",j)] .+ (1 - β2) .* ((∇[string("∂b",j)]') .^ 2 )
 
-                    adam_opt[string("v_dw_corrected",j)] = adam_opt[string("v_dw",j)] ./ (1 - β1^j)
-                    adam_opt[string("v_db_corrected",j)] = adam_opt[string("v_db",j)] ./ (1 - β1^j)
-                    adam_opt[string("s_dw_corrected",j)] = adam_opt[string("s_dw",j)] ./ (1 - β2^j)
-                    adam_opt[string("s_db_corrected",j)] = adam_opt[string("s_db",j)] ./ (1 - β2^j)
+                    adam_opt[string("v_dw_corrected",j)] = adam_opt[string("v_dw",j)] ./ (1 - β1^t)
+                    adam_opt[string("v_db_corrected",j)] = adam_opt[string("v_db",j)] ./ (1 - β1^t)
+                    adam_opt[string("s_dw_corrected",j)] = adam_opt[string("s_dw",j)] ./ (1 - β2^t)
+                    adam_opt[string("s_db_corrected",j)] = adam_opt[string("s_db",j)] ./ (1 - β2^t)
 
                 end
                 
