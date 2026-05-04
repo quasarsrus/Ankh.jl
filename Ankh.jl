@@ -193,8 +193,8 @@ function update_weights(params,∇::Any, learning_rate, network_size ,optimiser)
         κ = 1e-7
         param_rms, param_bp = ∇
         for i = 1:network_size-1
-            params[string("W", (i))] -= learning_rate .* param_bp[string("∂W",(i))]' ./ sqrt.(param_rms[string("s_dw",i)] .+ κ)
-            params[string("b", (i))] -= learning_rate .* param_bp[string("∂b",(i))]' ./ sqrt.(param_rms[string("s_db",i)] .+ κ)
+            params[string("W", (i))] -= learning_rate .* param_bp[string("∂W",(i))]' ./ (sqrt.(param_rms[string("s_dw",i)]) .+ κ)
+            params[string("b", (i))] -= learning_rate .* param_bp[string("∂b",(i))]' ./ (sqrt.(param_rms[string("s_db",i)]) .+ κ)
         end
         return params
         
